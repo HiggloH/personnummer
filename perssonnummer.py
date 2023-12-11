@@ -76,6 +76,7 @@ def kolla_kon(nummer):
 
 
 def kolla_inputen(pnr):
+    # Kolla så att det inte finns några symboler som inte ska vara i personnumret
     try:
         for n in pnr:
             if n == "-":
@@ -89,18 +90,59 @@ def kolla_inputen(pnr):
 
     utan = False
 
+    gammal = False
+    ung = False
+
+    # Kolla så att personnumret är rätt längd
     if len(pnr) == 11:
         datum = pnr[:6]
     elif len(pnr) == 10:
         datum = pnr[:6]
         utan = True
     elif len(pnr) == 13:
+        # Om pnr är 13 kan det vara ett ogiltigt personnummer eftersom det kan vara fler än fyra tal efter - eller + tecknet
+        if "-" in pnr:
+            t_index = pnr.index("-")
+            d_length = pnr[:t_index]
+            f_length = pnr[t_index:]
+
+            # Kolla så att det är rätt mängd element före och efter tecknet
+            if len(d_length) == 8:
+                pass
+            else:
+                return "l_error"
+
+            if len(f_length) == 5:
+                pass
+            else:
+                return "l_error"
+
+            ung = True
+        elif "+" in pnr:
+            t_index = pnr.index("+")
+            d_length = pnr[:t_index]
+            f_length = pnr[t_index:]
+
+            # Kolla så att det är rätt mängd element före och efter tecknet
+            if len(d_length) == 8:
+                pass
+            else:
+                return "l_error"
+
+            if len(f_length) == 5:
+                pass
+            else:
+                return "l_error"
+
+            gammal = True
+        else:
+            return "l_error"
+
         datum = pnr[:8]
     elif len(pnr) == 12:
         datum = pnr[:8]
         utan = True
     else:
-        print("test")
         return "l_error"
 
     # Ta fram månaden året och dagen ur personnumret
@@ -132,6 +174,15 @@ def kolla_inputen(pnr):
                 else:
                     yy = "19" + str(yy)
 
+    # Kolla  så att tecknet stämmer med året om året är skrivet åååå och det finns ett tecken
+    if gammal:
+        if int(yy) >= 1925:
+            return "y_error"
+
+    if ung:
+        if int(yy) <= 1925:
+            return "y_error"
+
     # kolla ifall det är ett skott år
     skott = (int(yy) % 4) == 0
 
@@ -141,16 +192,19 @@ def kolla_inputen(pnr):
         else:
             skott = False
 
+    # Ändra antalet dagar i februari om det är skottår
     if skott:
         dagar[1] = 29
     else:
         dagar[1] = 28
 
+    # Kolla så att månaden finns
     try:
         m_nummer.index(mm)
     except ValueError:
         return "m_error"
 
+    # Kolla så att dagen är inom spanet av antal dagar i månaden
     if 1 <= int(dd) <= dagar[m_nummer.index(mm)]:
         pass
     else:
@@ -158,6 +212,7 @@ def kolla_inputen(pnr):
 
     rent_pnr = ""
 
+    # Ta bort - eller + om det finns i personnumret
     if not utan:
         pnr = list(pnr)
         if pnr[6] == "-" or pnr[6] == "+":
@@ -252,6 +307,8 @@ def skriv_s(nummer):
         print("det finns annat än siffror i talet")
     elif nummer == "d_error":
         print("Den dagen finns inte")
+    elif nummer == "y_error":
+        print("Året går inte ihop med tecknet")
     elif nummer == "l_error":
         print("personnumret är för långt eller för kort")
     else:
