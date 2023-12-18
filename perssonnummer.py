@@ -100,7 +100,8 @@ def kolla_inputen(pnr):
         datum = pnr[:6]
         utan = True
     elif len(pnr) == 13:
-        # Om pnr är 13 kan det vara ett ogiltigt personnummer eftersom det kan vara fler än fyra tal efter - eller + tecknet
+        # Om pnr är 13 kan det vara ett ogiltigt personnummer eftersom
+        # det kan vara fler än fyra tal efter - eller + tecknet
         if "-" in pnr:
             t_index = pnr.index("-")
             d_length = pnr[:t_index]
@@ -140,6 +141,16 @@ def kolla_inputen(pnr):
 
         datum = pnr[:8]
     elif len(pnr) == 12:
+        try:
+            pnr.index("-")
+
+            return "l_error"
+        except ValueError:
+            try:
+                pnr.index("+")
+            except ValueError:
+                return "l_error"
+
         datum = pnr[:8]
         utan = True
     else:
@@ -173,6 +184,8 @@ def kolla_inputen(pnr):
                     yy = "18" + str(yy)
                 else:
                     yy = "19" + str(yy)
+    else:
+        return "l_error"
 
     # Kolla  så att tecknet stämmer med året om året är skrivet åååå och det finns ett tecken
     if gammal:
